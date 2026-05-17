@@ -2,7 +2,7 @@ module mediatypes
 
 import io
 
-// parse parses the multiline MIME-types file content e.g. /etc/mime.types.
+// parse_string parses the multiline MIME-types file content e.g. /etc/mime.types.
 // The resulting map keys are `type/subtype` media type names.
 pub fn parse_string(data string) map[string]MediaType {
 	mut result := map[string]MediaType{}
