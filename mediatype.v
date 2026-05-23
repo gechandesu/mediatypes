@@ -28,6 +28,7 @@ pub enum MediaTypeStringOpt {
 
 // string returns the string with media type name with parameters suitable for use
 // as HTTP or email Content-Type header value. Example: `text/plain; charset=UTF-8`.
+// See also `parse_content_type()`.
 pub fn (t MediaType) string(params MediaTypeFormatParams) string {
 	mut res := t.name()
 	mut sep := '; '

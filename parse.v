@@ -67,3 +67,57 @@ fn parse_line_internal(line string) !MediaType {
 		extensions: extensions
 	}
 }
+
+// parse_content_type parses the Content-Type header and returns the media type.
+pub fn parse_content_type(header string) !MediaType {
+	if !header.is_pure_ascii() {
+		return error('ascii text expected')
+	}
+
+	mut input := header.trim_space()
+
+	if input.to_lower_ascii().starts_with('content-type:') {
+		input = input[13..].trim_space()
+	}
+
+	if input == '' {
+		return error('empty media type name')
+	}
+
+	parts := input.split(';')
+	main_parts := parts[0].trim_space().split('/')
+
+	if main_parts.len != 2 {
+		return error('invalid type name, type/subtype expected: ${parts[0]}')
+	}
+
+	main_type := main_parts[0].trim_space().to_lower()
+	sub_type := main_parts[1].trim_space().to_lower()
+
+	if main_type == '' || sub_type == '' {
+		return error('invalid type name, type/subtype expected: ${parts[0]}')
+	}
+
+	mut params := map[string]string{}
+
+	for i := 1; i < parts.len; i++ {
+		param := parts[i].trim_space()
+		if param == '' {
+			continue // skip empty parameters
+		}
+		key, mut val := param.split_once('=') or { '', '' }
+		if key == '' || val == '' {
+			continue // skip invalid parameters
+		}
+		if val.starts_with('"') && val.ends_with('"') && val.len >= 2 {
+			val = val[1..val.len - 1] // trim quotes
+		}
+		params[key] = val
+	}
+
+	return MediaType{
+		type:       main_type
+		subtype:    sub_type
+		parameters: params
+	}
+}

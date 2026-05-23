@@ -32,3 +32,44 @@ fn test_parse() {
 	result := mediatypes.parse(mut file)
 	assert result.len > 0
 }
+
+fn test_parse_content_type() {
+	test_data_valid := {
+		// vfmt off
+		'Content-Type: text/plain': mediatypes.MediaType{
+			@type:   'text'
+			subtype: 'plain'
+		}
+		'content-type: text/plain': mediatypes.MediaType{
+			@type:   'text'
+			subtype: 'plain'
+		}
+		'Content-Type: text/plain; charset=UTF-8': mediatypes.MediaType{
+			@type:      'text'
+			subtype:    'plain'
+			parameters: {
+				'charset': 'UTF-8'
+			}
+		}
+		'Content-Type: text/plain; charset="UTF-8"': mediatypes.MediaType{
+			@type:      'text'
+			subtype:    'plain'
+			parameters: {
+				'charset': 'UTF-8'
+			}
+		}
+		'Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes': mediatypes.MediaType{
+			@type:      'text'
+			subtype:    'plain'
+			parameters: {
+				'charset': 'utf-8'
+				'format':  'flowed'
+				'delsp':   'yes'
+			}
+		}
+		// vfmt on
+	}
+	for input, output in test_data_valid {
+		assert mediatypes.parse_content_type(input)! == output
+	}
+}
